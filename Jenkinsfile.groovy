@@ -15,7 +15,6 @@ pipeline {
         registry = "wassimslim/achat"
         DOCKER_CREDS_USR = "wassimslim"
         DOCKER_CREDS = credentials('dockerhub-user-credentials')
-
             }
  stages{
 
@@ -43,7 +42,6 @@ pipeline {
                    sh 'mvn test'
                 }
         }
-
 
     stage("MAVEN SonarQube") {
         steps{
@@ -85,49 +83,33 @@ pipeline {
                 }
         }
         }
-
- 
            stage('Building our image') {
-
                 steps {
-
                     script {
-
                     dockerImage = docker.build registry + ":$BUILD_NUMBER"
                 }
-
             }
-
         }
-
             stage('Deploy our image') {
-
                 steps {
-
                     script {
-
                         docker.withRegistry( '', DOCKER_HUB ) {
-
                         dockerImage.push()
-
                     }
-
                 }
-
             }
-
         }
-
             stage('Cleaning up') {
-
                 steps {
-
                     sh "docker rmi $registry:$BUILD_NUMBER"
-
             }
             }
-        }
-        
+           stage('Docker Compose UP SPRING BOOT & MYSQL & Angular') { 
+        steps{
+            sh "docker-compose -f /root/springApp-mysql/docker-compose.yml up -d"
+             }
+    }
+        } 
       post {
         always {
             
