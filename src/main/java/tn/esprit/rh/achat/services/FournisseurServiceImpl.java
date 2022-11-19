@@ -13,6 +13,7 @@ import tn.esprit.rh.achat.repositories.SecteurActiviteRepository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -29,7 +30,7 @@ public class FournisseurServiceImpl implements IFournisseurService {
 
 	@Override
 	public List<Fournisseur> retrieveAllFournisseurs() {
-		List<Fournisseur> fournisseurs = (List<Fournisseur>) fournisseurRepository.findAll();
+		List<Fournisseur> fournisseurs = fournisseurRepository.findAll();
 		for (Fournisseur fournisseur : fournisseurs) {
 			log.info(" fournisseur : " + fournisseur);
 		}
@@ -68,14 +69,24 @@ public class FournisseurServiceImpl implements IFournisseurService {
 	@Override
 	public Fournisseur retrieveFournisseur(Long fournisseurId) {
 
-		Fournisseur fournisseur = fournisseurRepository.findById(fournisseurId).orElse(null);
-		return fournisseur;
+		return fournisseurRepository.findById(fournisseurId).orElse(null);
 	}
 
 	@Override
 	public void assignSecteurActiviteToFournisseur(Long idSecteurActivite, Long idFournisseur) {
-		Fournisseur fournisseur = fournisseurRepository.findById(idFournisseur).orElse(null);
-		SecteurActivite secteurActivite = secteurActiviteRepository.findById(idSecteurActivite).orElse(null);
+				Fournisseur fournisseur = new Fournisseur();
+
+			Optional<Fournisseur> fournisseurOpt = fournisseurRepository.findById(idFournisseur);
+			if(fournisseurOpt.isPresent()) {
+				fournisseur = fournisseurOpt.get();
+			}
+				SecteurActivite secteurActivite = new SecteurActivite();
+
+			Optional<SecteurActivite> secteurActiviteOpt = secteurActiviteRepository.findById(idSecteurActivite);
+			if(secteurActiviteOpt.isPresent()) {
+				secteurActivite = secteurActiviteOpt.get();
+			}
+
         fournisseur.getSecteurActivites().add(secteurActivite);
         fournisseurRepository.save(fournisseur);
 		
