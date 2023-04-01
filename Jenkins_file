@@ -1,0 +1,32 @@
+stages{
+
+    stage('GIT') { 
+        steps{
+        git url:'https://github.com/malekbenabdellatif/projet_Devops.git', branch : 'wassim-prod'
+             }
+    }
+    stage('MAVEN clean'){
+         steps{
+           echo 'Cleaning Project '
+           echo "Maven Version "
+           sh "mvn -Dmaven.test.failure.ignore=true clean package"
+              }
+      }
+    stage('MAVEN COMPILE'){
+            steps{
+                script{
+                        sh 'mvn clean install -DskipTests'
+                }
+            }
+        }
+    stage('Create database') {
+            steps {
+                sh "mysql -u root -p -e 'CREATE DATABASE Achat;'"
+                sh "mysql -u root -p Achat < db/migration/V1__Create_tables.sql"
+            }
+        }
+    stage("Runing Tests with Mockito & JUNIT TEST") {
+               steps{
+                   sh 'mvn test'
+                }
+        }
