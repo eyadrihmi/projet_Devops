@@ -2,7 +2,7 @@ stages{
 
     stage('GIT') { 
         steps{
-        git url:'https://github.com/malekbenabdellatif/projet_Devops.git', branch : 'wassim-prod'
+        git url:'https://github.com/eyadrihmi/projet_Devops.git'
              }
     }
     stage('MAVEN clean'){
