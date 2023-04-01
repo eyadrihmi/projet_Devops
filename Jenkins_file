@@ -9,24 +9,24 @@ stages{
          steps{
            echo 'Cleaning Project '
            echo "Maven Version "
-           sh "mvn -Dmaven.test.failure.ignore=true clean package"
+           bat "mvn -Dmaven.test.failure.ignore=true clean package"
               }
       }
     stage('MAVEN COMPILE'){
             steps{
                 script{
-                        sh 'mvn clean install -DskipTests'
+                        bat 'mvn clean install -DskipTests'
                 }
             }
         }
     stage('Create database') {
             steps {
-                sh "mysql -u root -p -e 'CREATE DATABASE Achat;'"
-                sh "mysql -u root -p Achat < V1__Create_tables.sql"
+                bat "mysql -u root -p -e 'CREATE DATABASE Achat;'"
+                bat "mysql -u root -p Achat < V1__Create_tables.sql"
             }
         }
     stage("Runing Tests with Mockito & JUNIT TEST") {
                steps{
-                   sh 'mvn test'
+                   bat 'mvn test'
                 }
         }
