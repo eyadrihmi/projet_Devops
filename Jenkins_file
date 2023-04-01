@@ -30,3 +30,4 @@ stages{
                    bat 'mvn test'
                 }
         }
+  }
