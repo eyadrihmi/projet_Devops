@@ -1,4 +1,8 @@
-stages{
+pipeline {
+    agent any
+
+    
+ stages{
 
     stage('GIT') { 
         steps{
@@ -30,4 +34,4 @@ stages{
                    bat 'mvn test'
                 }
         }
-  }
+  }}
