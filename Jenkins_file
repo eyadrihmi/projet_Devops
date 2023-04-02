@@ -9,20 +9,7 @@ pipeline {
         git url:'https://github.com/eyadrihmi/projet_Devops.git'
              }
     }
-    stage('MAVEN clean'){
-         steps{
-           echo 'Cleaning Project '
-           echo "Maven Version "
-           bat "mvn -Dmaven.test.failure.ignore=true clean package"
-              }
-      }
-    stage('MAVEN COMPILE'){
-            steps{
-                script{
-                        bat 'mvn clean install -DskipTests'
-                }
-            }
-        }
+   
     stage('Create database') {
             steps {
                 bat "mysql -u root -p -e 'CREATE DATABASE Achat;'"
