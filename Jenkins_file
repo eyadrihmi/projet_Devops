@@ -31,14 +31,6 @@ pipeline {
             }
         }
         
-
-   
-    stage('Create database') {
-            steps {
-                sh "mysql -u root -p -e 'CREATE DATABASE Achat;'"
-                sh "mysql -u root -p Achat < V1__Create_tables.sql"
-            }
-        }
     stage("Runing Tests with Mockito & JUNIT TEST") {
                steps{
                    sh 'mvn test'
