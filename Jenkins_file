@@ -9,16 +9,39 @@ pipeline {
         git url:'https://github.com/eyadrihmi/projet_Devops.git'
              }
     }
+    
+     stage('UNIT Testing'){
+
+            steps{
+                sh 'mvn test'
+            }
+        }
+        
+        stage('Integration testing'){
+
+            steps{
+                sh 'mvn verify -DskipUnitTests'
+            }
+        }
+
+        stage('Maven Build'){
+
+            steps{
+                sh 'mvn clean install'
+            }
+        }
+        
+
    
     stage('Create database') {
             steps {
-                bat "mysql -u root -p -e 'CREATE DATABASE Achat;'"
-                bat "mysql -u root -p Achat < V1__Create_tables.sql"
+                sh "mysql -u root -p -e 'CREATE DATABASE Achat;'"
+                sh "mysql -u root -p Achat < V1__Create_tables.sql"
             }
         }
     stage("Runing Tests with Mockito & JUNIT TEST") {
                steps{
-                   bat 'mvn test'
+                   sh 'mvn test'
                 }
         }
   }}
