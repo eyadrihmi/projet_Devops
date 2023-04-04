@@ -47,19 +47,19 @@ pipeline {
                     nexusArtifactUploader artifacts: 
                     [
                     [
-                    artifactId: 'spring-boot-starter-parent',
+                    artifactId: 'achat',
                     classifier: '',
                     file: 'target/achat-1.0.jar',
                     type: 'jar'
                     ]
                     ],
                     credentialsId: 'nexus-auth',
-                    groupId: 'org.springframework.boot', 
+                    groupId: 'tn.esprit.rh', 
                     nexusUrl: '172.29.12.42:8081',
                     nexusVersion: 'nexus3',
                     protocol: 'http',
                     repository: 'demoapp-release',
-                    version: '2.5.3'
+                    version: '1.0'
                   
                 }
             }
