@@ -1,63 +1,56 @@
 pipeline {
     agent any
-     environment {
+    environment {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "172.29.12.42:8081"
         NEXUS_REPOSITORY = "demoapp-release"
         NEXUS_CREDENTIAL_ID = ""
-            }
-
-    
- stages{
-
-    stage('GIT') { 
-        steps{
-        git url:'https://github.com/eyadrihmi/projet_Devops.git'
-             }
     }
+    stages {
+        stage('GIT') { 
+            steps {
+                git url:'https://github.com/eyadrihmi/projet_Devops.git'
+            }
+        }
     
-     stage('UNIT Testing'){
-
-            steps{
+        stage('UNIT Testing') {
+            steps {
                 sh 'mvn test'
             }
         }
         
-        stage('Integration testing'){
-
-            steps{
+        stage('Integration testing') {
+            steps {
                 sh 'mvn verify -DskipUnitTests'
             }
         }
 
-        stage('Maven Build'){
-
-            steps{
+        stage('Maven Build') {
+            steps {
                 sh 'mvn clean install'
             }
         }
         
-    stage("Runing Tests with Mockito & JUNIT TEST") {
-               steps{
-                   sh 'mvn test'
-                }
+        stage("Runing Tests with Mockito & JUNIT TEST") {
+            steps {
+                sh 'mvn test'
+            }
         }
         
-    stage('SonarQube analysis'){
-
-            steps{
-                script{
+        stage('SonarQube analysis') {
+            steps {
+                script {
                     withSonarQubeEnv(credentialsId: 'sonar-api') {
                         sh 'mvn clean package sonar:sonar'
-                }
+                    }
                 }  
             }
         }
    
-    stage('MAVEN Nexus'){
-        steps {
-        script {
+        stage('MAVEN Nexus') {
+            steps {
+                script {
                     pom = readMavenPom file: "pom.xml";
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
@@ -66,10 +59,13 @@ pipeline {
                     if(artifactExists) {
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
                         nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
                             groupId: pom.groupId,
                             version: pom.version,
-                            repository: 'demoapp-release',
-                            credentialsId: '',
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
@@ -85,6 +81,17 @@ pipeline {
                         error "*** File: ${artifactPath}, could not be found";
                     }
                 }
+            }
         }
-  }}
+        
+             post {
+        always {
+            
+	    emailext to: "wassim.slim@esprit.tn",
+            subject: "jenkins build :${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\n More Infos can be found here : ${env.BUILD_URL}"
+         }
+    }
 }
+        
+        
