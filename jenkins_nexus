@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('GIT') { 
             steps {
-                git url:'https://github.com/eyadrihmi/projet_Devops.git'
+                git(url:'https://github.com/eyadrihmi/projet_Devops.git')
             }
         }
     
@@ -84,14 +84,12 @@ pipeline {
             }
         }
         
-             post {
-        always {
-            
-	    emailext to: "wassim.slim@esprit.tn",
-            subject: "jenkins build :${currentBuild.currentResult}: ${env.JOB_NAME}",
-            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\n More Infos can be found here : ${env.BUILD_URL}"
-         }
+        post {
+            always {
+                emailext(to: "drihmieya@gmail.com",
+                subject: "jenkins build :${currentBuild.currentResult}: ${env.JOB_NAME}",
+                body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\n More Infos can be found here : ${env.BUILD_URL}")
+            }
+        }
     }
 }
-        
-        
