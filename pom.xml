@@ -63,7 +63,6 @@
 
 	</dependencies>
 	<build>
-		<finalName>final</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -97,7 +96,7 @@
 <distributionManagement>
 		<repository>
 			<id>deployRepo</id>
-            <url>http://192.168.1.25:8081/repository/deployRepo/</url>
+            <url>http://172.29.12.42:8081/repository/demoapp-release/</url>
 		</repository>
 </distributionManagement>
   <profiles>
