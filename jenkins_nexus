@@ -1,12 +1,5 @@
 pipeline {
     agent any
-    environment {
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "172.29.12.42:8081"
-        NEXUS_REPOSITORY = "demoapp-release"
-        NEXUS_CREDENTIAL_ID = ""
-    }
     stages {
         stage('GIT') { 
             steps {
@@ -51,7 +44,22 @@ pipeline {
         stage('MAVEN Nexus') {
             steps {
                 script {
-                    nexusArtifactUploader artifacts: [[artifactId: 'spring-boot-starter-parent', classifier: '', file: 'dev', type: 'jar']], credentialsId: 'nexus-credentials', groupId: 'org.springframework.boot', nexusUrl: 'http://172.29.12.42:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'demoapp-release', version: '2.5.3'
+                    nexusArtifactUploader artifacts: 
+                    [
+                    [
+                    artifactId: 'spring-boot-starter-parent',
+                    classifier: '',
+                    file: 'dev.jar',
+                    type: 'jar'
+                    ]
+                    ],
+                    credentialsId: 'nexus-credentials',
+                    groupId: 'org.springframework.boot', 
+                    nexusUrl: '172.29.12.42:8081',
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    repository: 'demoapp-release',
+                    version: '2.5.3'
                   
                 }
             }
