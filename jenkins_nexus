@@ -49,11 +49,11 @@ pipeline {
                     [
                     artifactId: 'spring-boot-starter-parent',
                     classifier: '',
-                    file: 'achat-1.0.jar',
+                    file: 'target/achat-1.0.jar',
                     type: 'jar'
                     ]
                     ],
-                    credentialsId: 'nexus-credentials',
+                    credentialsId: 'nexus-auth',
                     groupId: 'org.springframework.boot', 
                     nexusUrl: '172.29.12.42:8081',
                     nexusVersion: 'nexus3',
