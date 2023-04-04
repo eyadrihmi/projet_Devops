@@ -55,7 +55,7 @@ pipeline {
         [
         [artifactId: 'spring-boot-starter-parent',
         classifier: '',
-        file: 'achat-1.0',
+        file: 'achat-1.0.jar',
         type: 'jar'
         ]
         ],
