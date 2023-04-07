@@ -1,5 +1,13 @@
 pipeline {
     agent any
+    
+    environment {
+        
+        dockerImage = ''
+        registry = "eyadrihmi/achat"
+        DOCKER_CREDS_USR = "wassimslim"
+        DOCKER_CREDS = credentials('dockerhub-user-credentials')
+            }
     stages {
         stage('GIT') { 
             steps {
@@ -67,7 +75,7 @@ pipeline {
          stage('Building our image') {
                 steps {
                     script {
-                    dockerImage = docker.build eyadrihmi/achat + ":$BUILD_NUMBER"
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
                 }
             }
         }
