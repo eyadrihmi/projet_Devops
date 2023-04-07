@@ -5,8 +5,7 @@ pipeline {
         
         dockerImage = ''
         registry = "eyadrihmi/achat"
-        DOCKER_CREDS_USR = "wassimslim"
-        DOCKER_CREDS = credentials('dockerhub-user-credentials')
+        
             }
     stages {
         stage('GIT') { 
