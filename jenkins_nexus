@@ -1,12 +1,11 @@
 pipeline {
     agent any
     
-    environment {
-        
+    environment {   
         dockerImage = ''
         registry = "eyadrihmi/achat"
-        
-            }
+    }
+    
     stages {
         stage('GIT') { 
             steps {
@@ -51,14 +50,13 @@ pipeline {
         stage('MAVEN Nexus') {
             steps {
                 script {
-                    nexusArtifactUploader artifacts: 
-                    [
-                    [
-                    artifactId: 'achat',
-                    classifier: '',
-                    file: 'target/achat-1.0.jar',
-                    type: 'jar'
-                    ]
+                    nexusArtifactUploader artifacts: [
+                        [
+                            artifactId: 'achat',
+                            classifier: '',
+                            file: 'target/achat-1.0.jar',
+                            type: 'jar'
+                        ]
                     ],
                     credentialsId: 'nexus-auth',
                     groupId: 'tn.esprit.rh', 
@@ -67,34 +65,31 @@ pipeline {
                     protocol: 'http',
                     repository: 'demoapp-release',
                     version: '1.0'
-                  
                 }
             }
         }
-         stage('Docker Image Build'){
-
+         
+	
+        stage('Docker Image Build'){
             steps{
                 script{
+		    sh 'docker login -u eyadrihmi -p ${docker_hub_cred}'
                     sh 'docker image build -t $JOB_NAME:v1.$BUILD_ID .'
-					//sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID'
-					//sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest'
+		    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID'
+		    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest'
                 }  
             }
         }
+        
         stage('Push image to the DockerHub'){
-
             steps{
                 script{
-		withCredentials([string(credentialsId: 'jinkins-sonar', variable: 'docker_hub_cred')]) {
-		
-                sh 'docker login -u khalil15832 -p ${docker_hub_pass}'
-						
-		sh 'docker image push khalil15832/$JOB_NAME:latest' 
-    }
-                    
+                    withCredentials([string(credentialsId: 'git_creds', variable: 'docker_hub_cred')]) {
+                        sh 'docker login -u eyadrihmi -p ${docker_hub_cred}'
+                        sh 'docker image push eyadrihmi/$JOB_NAME:latest' 
+                    }
                 }  
             }
         }
-
     }
 }
