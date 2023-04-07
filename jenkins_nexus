@@ -71,12 +71,28 @@ pipeline {
                 }
             }
         }
-         stage('Building our image') {
-                steps {
-                    script {
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                }
+         stage('Docker Image Build'){
+
+            steps{
+                script{
+                    sh 'docker image build -t $JOB_NAME:v1.$BUILD_ID .'
+					//sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID'
+					//sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest'
+                }  
             }
         }
+        stage('Push image to the DockerHub'){
+
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'git_pass', variable: 'docker_hub_pass')]) {
+						sh 'docker login -u khalil15832 -p ${docker_hub_pass}'
+						//sh 'docker image push khalil15832/$JOB_NAME:v1.$BUILD_ID'
+						sh 'docker image push khalil15832/$JOB_NAME:latest'
+					}
+                }  
+            }
+        }
+
     }
 }
