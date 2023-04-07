@@ -85,11 +85,13 @@ pipeline {
 
             steps{
                 script{
-                    withCredentials([string(credentialsId: 'git_pass', variable: 'docker_hub_pass')]) {
-						sh 'docker login -u khalil15832 -p ${docker_hub_pass}'
-						//sh 'docker image push khalil15832/$JOB_NAME:v1.$BUILD_ID'
-						sh 'docker image push khalil15832/$JOB_NAME:latest'
-					}
+		withCredentials([string(credentialsId: 'jinkins-sonar', variable: 'docker_hub_cred')]) {
+		
+                sh 'docker login -u khalil15832 -p ${docker_hub_pass}'
+						
+		sh 'docker image push khalil15832/$JOB_NAME:latest' 
+    }
+                    
                 }  
             }
         }
