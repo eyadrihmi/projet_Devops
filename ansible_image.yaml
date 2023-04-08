@@ -1,0 +1,52 @@
+---
+- name: Build and Push Docker images
+  hosts: localhost
+  gather_facts: false
+  
+  vars:
+    dockerhub_username: "eyadrihmi"
+    dockerhub_password: "eya25430213"
+    dockerhub_email: "drihmieya@gmail.com"
+    front_repo_name: "achat"
+    back_repo_name: "achat"
+    front_build_dir: "/front-devops"
+    back_build_dir: "/projet_Devops"
+  
+  tasks:
+    - name: Build Front Docker image
+      docker_build:
+        path: "{{ front_build_dir }}"
+        tag: "{{ dockerhub_username }}/{{ front_repo_name }}:latest"
+      register: front_build
+      
+    - name: Build Back Docker image
+      docker_build:
+        path: "{{ back_build_dir }}"
+        tag: "{{ dockerhub_username }}/{{ back_repo_name }}:latest"
+      register: back_build
+      
+    - name: Push Front Docker image to Docker Hub
+      docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
+        email: "{{ dockerhub_email }}"
+      when: front_build.changed
+      no_log: true
+      
+    - name: Push Front Docker image to Docker Hub
+      docker_image_push:
+        name: "{{ dockerhub_username }}/{{ front_repo_name }}:latest"
+      when: front_build.changed
+      
+    - name: Push Back Docker image to Docker Hub
+      docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
+        email: "{{ dockerhub_email }}"
+      when: back_build.changed
+      no_log: true
+      
+    - name: Push Back Docker image to Docker Hub
+      docker_image_push:
+        name: "{{ dockerhub_username }}/{{ back_repo_name }}:latest"
+      when: back_build.changed
