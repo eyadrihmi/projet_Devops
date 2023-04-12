@@ -73,7 +73,7 @@ pipeline {
         stage('Docker Image Build'){
             steps{
                 script{
-		    sh 'docker login -u eyadrihmi -p ${docker_hub_cred}'
+		    sh 'docker login -u eyadrihmi -p "eya25430213"'
                     sh 'docker image build -t $JOB_NAME:v1.$BUILD_ID .'
 		    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/achat/$JOB_NAME:v1.$BUILD_ID'
 		    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/achat/$JOB_NAME:latest'
