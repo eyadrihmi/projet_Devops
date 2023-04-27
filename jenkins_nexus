@@ -12,7 +12,11 @@ pipeline {
                 git url:'https://github.com/eyadrihmi/projet_Devops.git'
             }
         }
-    
+      stage('Maven Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
         stage('UNIT Testing') {
             steps {
                 sh 'mvn test'
@@ -25,11 +29,7 @@ pipeline {
             }
         }
 
-        stage('Maven Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
+       
         
         stage("Running Tests with Mockito & JUnit Test") {
             steps {
