@@ -14,24 +14,25 @@ pipeline {
         }
 	
 	
-      stage('Maven Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
+      
         stage('UNIT Testing') {
             steps {
                 sh 'mvn test'
             }
         }
-        
+	
+      
         stage('Integration testing') {
             steps {
                 sh 'mvn verify -DskipUnitTests'
             }
         }
 
-       
+         stage('Maven Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
         
         stage("Running Tests with Mockito & JUnit Test") {
             steps {
@@ -62,10 +63,10 @@ pipeline {
                     ],
                     credentialsId: 'nexus-auth',
                     groupId: 'tn.esprit.rh', 
-                    nexusUrl: '172.29.12.42:8081',
+                    nexusUrl: '172.29.12.70:8081',
                     nexusVersion: 'nexus3',
                     protocol: 'http',
-                    repository: 'demoapp-release',
+                    repository: 'achat',
                     version: '1.0'
                 }
             }
