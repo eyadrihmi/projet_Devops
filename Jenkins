@@ -1,7 +1,7 @@
 pipeline {
     agent any
     
-    environment {   
+    environment {
         dockerImage = ''
         registry = "eyadrihmi/achat"
     }
@@ -13,14 +13,14 @@ pipeline {
             }
         }
         
-      stages {
-        stage('Sending docker file to ansible server ') { 
-            sshagent(['ansible']) {
-            sh 'ssh -o StrictHostKeyChecking=no centos@172.29.12.70'
-            sh 'scp /var/lib/jenkins/workspace/back_devops/* centos@172.29.12.70:/root/Desktop'
-           }
+        stage('Sending docker file to ansible server') { 
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no centos@172.29.12.70'
+                    sh 'scp /var/lib/jenkins/workspace/back_devops/* centos@172.29.12.70:/root/Desktop'
+                }
+            }
         }
-    
-        
     }
 }
+
