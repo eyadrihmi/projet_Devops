@@ -1,11 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        dockerImage = ''
-        registry = "eyadrihmi/achat"
-    }
-    
     stages {
         stage('GIT') { 
             steps {
