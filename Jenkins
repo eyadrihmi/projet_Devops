@@ -16,8 +16,8 @@ pipeline {
         stage('Sending docker file to ansible server') { 
             steps {
                 sshagent(['ansible']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70'
-                    sh 'scp /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root/Desktop'
+                    sh 'ssh -o StrictHostKeyChecking=no C3-DRIHMI-SR122@172.29.12.70'
+                    sh 'scp /var/lib/jenkins/workspace/back_devops/* C3-DRIHMI-SR122@172.29.12.70:/root/Desktop'
                 }
             }
         }
