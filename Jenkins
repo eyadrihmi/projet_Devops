@@ -12,10 +12,24 @@ pipeline {
             steps {
                 sshagent(['ansible']) {
                     sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70'
-                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root/'
                 }
             }
         }
+        
+        stage('Docker Build image') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/ '
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image build -t $JOB_NAME:v1.$BUILD_ID . '
+                }
+            }
+        }
+        
+        
+        
+        
     }
+   
 }
 
