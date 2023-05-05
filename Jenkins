@@ -20,29 +20,27 @@ pipeline {
         stage('Docker Build image with Ansible') {
             steps {
                 sshagent(['ansible']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image build -t $JOB_NAME:v1.$BUILD_ID . '
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image build -t $JOB_NAME:v1.$BUILD_ID ."'
                 }
             }
         }
         
-       stage('Docker image tagguig') {
+        stage('Docker image tagging') {
             steps {
                 sshagent(['ansible']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID '
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest"'
                 }
             }
         }
+        
         stage('Docker Push image with Ansible') {
             steps {
                 sshagent(['ansible']) {
-                     withCredentials([string(credentialsId: 'github_cred', variable: 'docker_hub_cred')]) {
+                    withCredentials([string(credentialsId: 'github_cred', variable: 'docker_hub_cred')]) {
 		                sh 'docker login -u eyadrihmi -p ${docker_hub_cred} docker.io'
-                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image push eyadrihmi/$JOB_NAME:v1.$BUILD_ID '
-                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 docker image push eyadrihmi/$JOB_NAME:latest '
+                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
+                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:latest"'
                     }
                 }
             }
@@ -57,28 +55,14 @@ pipeline {
             }
         }
 	
-	stage('Kubernetes Deployment using Ansible') {
-              steps {
-               sshagent(['ansible']) {
-                  sh 'echo "ansible" > ansible_passphrase.txt'
-                  sh 'chmod 600 ansible_passphrase.txt'
-                  sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && ansible-playbook ansible.yml --vault-password-file ansible_passphrase.txt"'
-        }
-    }
-}
-
-	stage('Kubernetes Deployment using Ansible') {
+        stage('Kubernetes Deployment using Ansible') {
             steps {
-                sshagent(['ansible']){
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook ansible.yml '
+                sshagent(['ansible']) {
+                    sh 'echo "ansible" > ansible_passphrase.txt'
+                    sh 'chmod 600 ansible_passphrase.txt'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && ansible-playbook ansible.yml --vault-password-file ansible_passphrase.txt"'
                 }
             }
         }
-        
-        
-        
     }
-   
 }
-
