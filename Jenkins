@@ -48,7 +48,14 @@ pipeline {
             }
         } 
       
-        
+        stage('Copy files from ansible to kubernetes server') {
+            steps {
+                sshagent(['kubernetes_server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.7'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.7:/root/work/'
+                }
+            }
+        }
         
         
         
