@@ -58,9 +58,8 @@ pipeline {
         stage('Kubernetes Deployment using Ansible') {
             steps {
                 sshagent(['ansible']) {
-                    sh 'echo "ansible" > ansible_passphrase.txt'
-                    sh 'chmod 600 ansible_passphrase.txt'
-                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && ansible-playbook ansible.yml --vault-password-file ansible_passphrase.txt"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook ansible.yml '
                 }
             }
         }
