@@ -1,0 +1,9 @@
+- hosts: all
+  become: true
+  tasks: 
+     - name: delete old deployment and service of Front-end Angular
+       command: kubectl delete -f /root/deploymentservice.yml
+     - name: create new deployment and service of Front-end Angular
+       command: kubectl apply -f /root/deploymentservice.yml
+
+     
