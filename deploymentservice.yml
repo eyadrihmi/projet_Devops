@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-app-deployment
+  labels:
+    app: angular-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: angular-app
+  template:
+    metadata:
+      labels:
+        app: angular-app
+    spec:
+      containers:
+      - name: angular-app
+        image: eyadrihmi/front_devops:latest
+        ports:
+        - containerPort: 4201
+        command: ["ng", "serve", "--host", "0.0.0.0", "--port", "4201"]
+        env:
+        - name: url
+          value: http://10.44.0.1:30408/SpringMVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: angular-app-service
+spec:
+  selector:
+    app: angular-app
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 4201
+    nodePort: 31110
+
+
