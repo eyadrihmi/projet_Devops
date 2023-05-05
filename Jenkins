@@ -59,7 +59,7 @@ pipeline {
             steps {
                 sshagent(['ansible']) {
                     sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-		    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible -m ping node '
+		    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ ansible -m ping node '
                     sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook ansible.yml '
                 }
             }
