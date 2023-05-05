@@ -1,19 +1,21 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage('GIT') { 
+        stage('GIT') {
             steps {
-                git url:'https://github.com/eyadrihmi/projet_Devops.git'
+                git url: 'https://github.com/eyadrihmi/projet_Devops.git'
             }
         }
-        
-        stage('Sending docker file to ansible server') { 
+
+        stage('Sending docker file to ansible server') {
+            steps {
                 sshagent(['ansible']) {
-                    sh 'ssh -o StrictHostKeyChecking=no -l root@172.29.12.70'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70'
                     sh 'scp /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root/Desktop'
                 }
-            
+            }
         }
     }
 }
+
