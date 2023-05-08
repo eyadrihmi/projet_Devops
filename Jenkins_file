@@ -1,25 +1,26 @@
 pipeline {
     agent any
+
     stages {
-        stage('GIT') { 
+        stage('GIT') {
             steps {
-                git url:'https://github.com/eyadrihmi/projet_Devops.git'
+                git url: 'https://github.com/eyadrihmi/projet_Devops.git'
             }
         }
-    
-        stage('UNIT Testing') {
+	 stage('UNIT Testing') {
             steps {
                 sh 'mvn test'
             }
         }
-        
+	
+      
         stage('Integration testing') {
             steps {
                 sh 'mvn verify -DskipUnitTests'
             }
         }
 
-        stage('Maven Build') {
+         stage('Maven Build') {
             steps {
                 sh 'mvn clean install'
             }
@@ -30,39 +31,54 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        
-        stage('SonarQube analysis') {
+
+        stage('Sending docker file to Ansible server') {
             steps {
-                script {
-                    withSonarQubeEnv(credentialsId: 'sonar-api') {
-                        sh 'mvn clean package sonar:sonar'
-                    }
-                }  
-            }
-        }
-   
-        stage('MAVEN Nexus') {
-            steps {
-                script {
-                    nexusArtifactUploader artifacts: 
-                    [
-                    [
-                    artifactId: 'achat',
-                    classifier: '',
-                    file: 'target/achat-1.0.jar',
-                    type: 'jar'
-                    ]
-                    ],
-                    credentialsId: 'nexus-auth',
-                    groupId: 'tn.esprit.rh', 
-                    nexusUrl: '172.29.12.42:8081',
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    repository: 'demoapp-release',
-                    version: '1.0'
-                  
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root/work/'
                 }
             }
         }
+        
+        stage('Docker Build image with Ansible') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image build -t $JOB_NAME:v1.$BUILD_ID ."'
+                }
+            }
+        }
+        
+        stage('Docker image tagging') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest"'
+                }
+            }
+        }
+        
+        stage('Docker Push image with Ansible') {
+            steps {
+                sshagent(['ansible']) {
+                    withCredentials([string(credentialsId: 'github_cred', variable: 'docker_hub_cred')]) {
+		                sh 'docker login -u eyadrihmi -p ${docker_hub_cred} docker.io'
+                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
+                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:latest"'
+                    }
+                }
+            }
+        } 
+      
+        stage('Copy files from Ansible to Kubernetes server') {
+            steps {
+                sshagent(['kubernetes_server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.7'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.7:/root/work/'
+                }
+            }
+        }
+	
+        
     }
 }
