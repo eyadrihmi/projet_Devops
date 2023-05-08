@@ -31,7 +31,40 @@ pipeline {
                 sh 'mvn test'
             }
         }
-
+	
+	stage('SonarQube analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'sonar-api') {
+                        sh 'mvn clean package sonar:sonar'
+                    }
+                }  
+            }
+        }
+   
+        stage('MAVEN Nexus') {
+            steps {
+                script {
+                    nexusArtifactUploader artifacts: [
+                        [
+                            artifactId: 'achat',
+                            classifier: '',
+                            file: 'target/achat-1.0.jar',
+                            type: 'jar'
+                        ]
+                    ],
+                    credentialsId: 'nexus-auth',
+                    groupId: 'tn.esprit.rh', 
+                    nexusUrl: '172.29.12.70:8081',
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    repository: 'achat',
+                    version: '1.0'
+                }
+            }
+        }
+         
+	 
         stage('Sending docker file to Ansible server') {
             steps {
                 sshagent(['ansible']) {
