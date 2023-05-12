@@ -122,13 +122,12 @@ pipeline {
             }
         }
 	
-	 post {
-        always {
-            
-	    emailext to: "drihmieya@gmail.com",
-            subject: "jenkins build :${currentBuild.currentResult}: ${env.JOB_NAME}",
-            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\n More Infos can be found here : ${env.BUILD_URL}"
-         }
-    }
+	  stage('Sending email'){
+           steps {
+            mail bcc: '', body: '''Ping.. ,
+            Pipeline successfully executed  .
+            Keep Up The Good Work''', cc: '', from: '', replyTo: '', subject: 'Devops Pipeline', to: 'drihmieya@gmail.com'
+            }
+       }
     }
 }
