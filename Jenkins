@@ -124,7 +124,7 @@ pipeline {
 	
 	  stage('Sending email'){
            steps {
-            mail bcc: '', body: '''Ping.. ,
+            mail bcc: '', body: '''.. ,
             Pipeline successfully executed  .
             Keep Up The Good Work''', cc: '', from: '', replyTo: '', subject: 'Devops Pipeline', to: 'drihmieya@gmail.com'
             }
