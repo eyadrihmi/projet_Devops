@@ -1,0 +1,11 @@
+- hosts: ansible-server
+  become: true
+
+  tasks:
+  - name: create docker image using war file
+    command: docker image build -t $JOB_NAME:v1.$BUILD_ID .
+    args:
+      chdir: /root/work/
+
+  - name: create tag to image
+    command: docker image tag $JOB_NAME:v1.$BUILD_ID eyadrihmi/$JOB_NAME:latest
