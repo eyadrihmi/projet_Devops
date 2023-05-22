@@ -8,7 +8,6 @@ pipeline {
             }
         }
 	
-	 
         stage('Sending docker file to Ansible server') {
             steps {
                 sshagent(['ansible']) {
@@ -21,24 +20,23 @@ pipeline {
         stage('Docker Build and tag image with Ansible') {
             steps {
                 sshagent(['ansible']) {
-                   sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
-		               sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ ansible -m ping ansible-server'
-                   sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook image.yml '
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ ansible -m ping ansible-server'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook image.yml'
                 }
             }
         }
-        
         
         stage('Docker Push image with Ansible') {
             steps {
                 sshagent(['ansible']) {
                     withCredentials([string(credentialsId: 'github_cred', variable: 'docker_hub_cred')]) {
-		                sh 'docker login -u eyadrihmi -p ${docker_hub_cred} docker.io'
+                        sh 'docker login -u eyadrihmi -p ${docker_hub_cred} docker.io'
                         sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
                         sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:latest"'
                     }
                 }
             }
-        } 
-      
-        
+        }
+    }
+}
