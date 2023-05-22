@@ -27,16 +27,6 @@ pipeline {
             }
         }
         
-        stage('Docker Push image with Ansible') {
-            steps {
-                sshagent(['ansible']) {
-                    withCredentials([string(credentialsId: 'github_cred', variable: 'docker_hub_cred')]) {
-                        sh 'docker login -u eyadrihmi -p ${docker_hub_cred} docker.io'
-                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:v1.$BUILD_ID"'
-                        sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 "cd /root/work/ && docker image push eyadrihmi/$JOB_NAME:latest"'
-                    }
-                }
-            }
-        }
+        
     }
 }
