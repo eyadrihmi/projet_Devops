@@ -1,0 +1,113 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('GIT') {
+            steps {
+                git url: 'https://github.com/eyadrihmi/projet_Devops.git'
+            }
+        }
+	 stage('UNIT Testing') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+	
+      
+        stage('Integration testing') {
+            steps {
+                sh 'mvn verify -DskipUnitTests'
+            }
+        }
+
+         stage('Maven Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        
+        stage("Running Tests with Mockito & JUnit Test") {
+            steps {
+                sh 'mvn test'
+            }
+        }
+	
+	stage('SonarQube analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'sonar-api') {
+                        sh 'mvn clean package sonar:sonar'
+                    }
+                }  
+            }
+        }
+   
+        stage('MAVEN Nexus') {
+            steps {
+                script {
+                    nexusArtifactUploader artifacts: [
+                        [
+                            artifactId: 'achat',
+                            classifier: '',
+                            file: 'target/achat-1.0.jar',
+                            type: 'jar'
+                        ]
+                    ],
+                    credentialsId: 'nexus-auth',
+                    groupId: 'tn.esprit.rh', 
+                    nexusUrl: '172.29.12.70:8081',
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    repository: 'achat',
+                    version: '1.0'
+                }
+            }
+        }
+         
+	 
+        stage('Sending docker file to Ansible server') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.70:/root/work/'
+                }
+            }
+        }
+        
+            stage('Docker Build, Tag and Push image with Ansible') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ ansible -m ping ansible-server'
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook image.yml'
+                }
+            }
+        }
+        stage('Copy files from Ansible to Kubernetes server') {
+            steps {
+                sshagent(['kubernetes_server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.7'
+                    sh 'scp -r /var/lib/jenkins/workspace/back_devops/* root@172.29.12.7:/root/work/'
+                }
+            }
+        }
+	
+        stage('Kubernetes Deployment using Ansible') {
+            steps {
+                sshagent(['ansible']) {
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ '
+		                sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 cd /root/work/ ansible -m ping node '
+                    sh 'ssh -o StrictHostKeyChecking=no root@172.29.12.70 ansible-playbook ansible.yml '
+                }
+            }
+        }
+	
+	  stage('Sending email'){
+           steps {
+            mail bcc: '', body: '''
+            Pipeline successfully executed  .
+            Keep Up The Good Work''', cc: '', from: '', replyTo: '', subject: 'Devops Pipeline', to: 'drihmieya@gmail.com'
+            }
+       }
+    }
+}
